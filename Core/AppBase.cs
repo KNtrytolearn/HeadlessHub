@@ -15,7 +15,7 @@ public record ProcessLaunchResult(
     string? Error = null);
 
 /// <summary>
-/// Bounded circular buffer — keeps the last <c>capacity</c> entries and discards
+/// Bounded circular buffer 鈥?keeps the last <c>capacity</c> entries and discards
 /// the oldest when full. Prevents unbounded string growth in process output capture.
 /// </summary>
 public sealed class CircularBuffer<T>(int capacity)
@@ -29,7 +29,7 @@ public sealed class CircularBuffer<T>(int capacity)
         _head = (_head + 1) % capacity;
     }
 
-    /// <summary>Yields items in oldest→newest order.</summary>
+    /// <summary>Yields items in oldest鈫抧ewest order.</summary>
     public IEnumerable<T> ReadAll()
     {
         var start = _head;
@@ -42,7 +42,7 @@ public abstract class AppBase
 {
     public const int MonitorCapacity = 600;
 
-    // ── JSON-serialised state ────────────────────────────────────────────────
+    // 鈹€鈹€ JSON-serialised state 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
     [JsonProperty("Name")]
     public string Name { get; protected init; } = string.Empty;
@@ -74,7 +74,7 @@ public abstract class AppBase
     [JsonProperty("Configuration")]
     public Configuration? Configuration { get; protected init; }
 
-    // ── Runtime state (not serialised) ───────────────────────────────────────
+    // 鈹€鈹€ Runtime state (not serialised) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
     /// <summary>All reads and writes go through _stateLock to avoid TOCTOU races.</summary>
     [JsonIgnore]
@@ -111,9 +111,9 @@ public abstract class AppBase
 
     /// <summary>Injected by ProfileManager after deserialisation.</summary>
     [JsonIgnore]
-    private protected ILogger? Logger { get; set; }
+    protected internal ILogger? Logger { get; set; }
 
-    // ── Constructor ──────────────────────────────────────────────────────────
+    // 鈹€鈹€ Constructor 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
     protected AppBase(
         string name,
@@ -139,7 +139,7 @@ public abstract class AppBase
         Configuration = configuration;
     }
 
-    // ── Public API ────────────────────────────────────────────────────────────
+    // 鈹€鈹€ Public API 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
     /// <returns>
     /// A result record. Callers MUST check <c>Success</c> and log <c>Error</c> when false.
@@ -184,7 +184,7 @@ public abstract class AppBase
             if (!_running) return;
             _StopUnsafe();
         }
-        // Also kill any stray process by executable name (outside the lock — I/O)
+        // Also kill any stray process by executable name (outside the lock 鈥?I/O)
         var exePath = SetRunExecutable();
         if (!string.IsNullOrEmpty(exePath))
             Helper.KillProcess(exePath);
@@ -196,14 +196,14 @@ public abstract class AppBase
     public bool IsInstalled() =>
         !string.IsNullOrEmpty(SetRunExecutable()) && File.Exists(SetRunExecutable()!);
 
-    // ── Abstract contracts ────────────────────────────────────────────────────
+    // 鈹€鈹€ Abstract contracts 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
     public abstract bool Install();
     public abstract bool IsConfigurable();
     public abstract bool IsInstallable();
     protected abstract string? SetRunExecutable();
 
-    // ── Private helpers ───────────────────────────────────────────────────────
+    // 鈹€鈹€ Private helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
     /// <summary>
     /// Stops and cleans up the current process. Must be called while holding _stateLock.
@@ -239,7 +239,7 @@ public abstract class AppBase
 
     /// <summary>
     /// Launches the subprocess. Must be called while holding _stateLock.
-    /// Returns a result record — never swallows errors silently.
+    /// Returns a result record 鈥?never swallows errors silently.
     /// </summary>
     private ProcessLaunchResult _StartProcessUnsafe()
     {
@@ -309,7 +309,7 @@ public abstract class AppBase
             Logger?.LogInformation("Started {App} with PID {Pid}", Name, _proc.Id);
 
             // Keep process object alive until Exited fires
-            _ = Task.Run(static p => { try { p?.WaitForExit(); } catch { } }, _proc);
+            _ = Task.Run(new Action<Process>(static p => { try { p?.WaitForExit(); } catch { } }), _proc);
 
             return new ProcessLaunchResult(true, _proc.Id);
         }
