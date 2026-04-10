@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeadlessHub</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f1117;
+    color: #e5e7eb;
+    padding: 24px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; }
+
+  h1 {
+    color: #38bdf8;
+    font-size: 1.75rem;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: #1a1d27;
+    border: 1px solid #2d3142;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #38bdf8;
+    margin-bottom: 14px;
+  }
+
+  .status-bar {
+    font-size: 0.9rem;
+    color: #9ca3af;
+  }
+
+  .status-bar span { color: #38bdf8; font-weight: 600; }
+
+  /* Profile list */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #2d3142;
+  }
+
+  .profile-row:last-child { border-bottom: none; }
+
+  .profile-name { font-weight: 600; color: #f3f4f6; }
+
+  /* App list */
+  .app-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #2d3142;
+  }
+
+  .app-row:last-child { border-bottom: none; }
+
+  .app-info { flex: 1; min-width: 0; }
+
+  .app-name { font-weight: 600; color: #f9fafb; font-size: 0.95rem; }
+
+  .app-desc {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .badges { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-running  { background: #16a34a; color: #fff; }
+  .badge-stopped  { background: #374151; color: #9ca3af; }
+  .badge-installed { background: #0e7490; color: #fff; }
+  .badge-missing  { background: transparent; border: 1px solid #4b5563; color: #6b7280; }
+  .badge-required { background: #7c3aed; color: #fff; }
+
+  .actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+
+  button {
+    background: #38bdf8;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  button:hover { opacity: 0.85; }
+  button:active { opacity: 0.7; }
+
+  button.stop      { background: #dc2626; color: #fff; }
+  button.download  { background: #7c3aed; color: #fff; }
+  button.start-profile { background: #16a34a; color: #fff; }
+  button.stop-profile  { background: #374151; color: #9ca3af; border: 1px solid #4b5563; }
+  button:disabled  { opacity: 0.4; cursor: not-allowed; }
+
+  /* Log box */
+  #log-box {
+    background: #080b14;
+    border: 1px solid #1e2433;
+    border-radius: 8px;
+    padding: 12px;
+    height: 260px;
+    overflow-y: auto;
+    font-family: "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .log-line { white-space: nowrap; }
+  .log-error  { color: #f87171; }
+  .log-warn   { color: #fbbf24; }
+  .log-info   { color: #38bdf8; }
+  .log-debug  { color: #6b7280; }
+
+  /* Loading */
+  .loading { color: #6b7280; font-size: 0.85rem; }
+
+  /* Empty state */
+  .empty { color: #4b5563; font-size: 0.85rem; padding: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>HeadlessHub</h1>
+  <p class="subtitle">autodarts.io Extension Manager</p>
+
+  <div class="card">
+    <div class="card-title">Status</div>
+    <div class="status-bar" id="status-bar">
+      <span class="loading">Loading…</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Profiles</div>
+    <div id="profiles-list"><p class="loading">Loading…</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Apps</div>
+    <div id="apps-list"><p class="loading">Loading…</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Live Logs</div>
+    <div id="log-box"></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var API = '/api';
+  var ws;
+  var refreshTimer;
+  var MAX_LOG_LINES = 500;
+
+  function $(id) { return document.getElementById(id); }
+
+  function api(url, method, body) {
+    var opts = { method: method || 'GET' };
+    if (body) {
+      opts.headers = { 'Content-Type': 'application/json' };
+      opts.body = JSON.stringify(body);
+    }
+    return fetch(url, opts)
+      .then(function (r) {
+        if (!r.ok) throw Error(r.status + ' ' + r.statusText);
+        return r.json();
+      });
+  }
+
+  // ── Status ──────────────────────────────────────────────────────────────
+  function renderStatus(s) {
+    $('status-bar').innerHTML =
+      '<span>' + s.platform + '</span> (' + s.architecture + ') &nbsp;|&nbsp;' +
+      'Running: <span>' + s.runningApps + '</span>/' + s.appCount + ' &nbsp;|&nbsp;' +
+      'Profiles: <span>' + s.profileCount + '</span>';
+  }
+
+  // ── Profiles ─────────────────────────────────────────────────────────────
+  function renderProfiles(profiles) {
+    if (!profiles || profiles.length === 0) {
+      $('profiles-list').innerHTML = '<p class="empty">No profiles found</p>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < profiles.length; i++) {
+      var p = profiles[i];
+      html += '<div class="profile-row">' +
+        '<span class="profile-name">' + esc(p.name) + '</span>' +
+        '<div class="actions">' +
+          '<button class="start-profile" onclick="window._runProfile(\'' + escAttr(p.name) + '\')">Start</button>' +
+          '<button class="stop-profile"  onclick="window._stopProfile(\'' + escAttr(p.name) + '\')">Stop</button>' +
+        '</div>' +
+      '</div>';
+    }
+    $('profiles-list').innerHTML = html;
+  }
+
+  // ── Apps ─────────────────────────────────────────────────────────────────
+  function renderApps(apps) {
+    if (!apps || apps.length === 0) {
+      $('apps-list').innerHTML = '<p class="empty">No apps found</p>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < apps.length; i++) {
+      var a = apps[i];
+      var runningBadge  = a.isRunning
+        ? '<span class="badge badge-running">Running</span>'
+        : '<span class="badge badge-stopped">Stopped</span>';
+      var installedBadge = a.isInstalled
+        ? '<span class="badge badge-installed">Installed</span>'
+        : '<span class="badge badge-missing">Missing</span>';
+
+      var btns = '';
+      if (a.isInstallable && !a.isInstalled)
+        btns += '<button class="download" onclick="window._downloadApp(\'' + escAttr(a.name) + '\')">Download</button>';
+      if (a.isInstalled && !a.isRunning)
+        btns += '<button onclick="window._runApp(\'' + escAttr(a.name) + '\')">Run</button>';
+      if (a.isRunning)
+        btns += '<button class="stop" onclick="window._stopApp(\'' + escAttr(a.name) + '\')">Stop</button>';
+
+      html += '<div class="app-row">' +
+        '<div class="app-info">' +
+          '<div class="app-name">' + esc(a.customName || a.name) + '</div>' +
+          '<div class="app-desc">' + esc(a.descriptionShort || '') + '</div>' +
+        '</div>' +
+        '<div class="badges">' + runningBadge + installedBadge + '</div>' +
+        '<div class="actions">' + btns + '</div>' +
+      '</div>';
+    }
+    $('apps-list').innerHTML = html;
+  }
+
+  // ── Logs ─────────────────────────────────────────────────────────────────
+  function appendLog(msg) {
+    var box = $('log-box');
+    var div = document.createElement('div');
+    div.className = 'log-line';
+    div.textContent = '[' + msg.timestamp + '] ' + msg.message;
+    if (msg.level === 'Error')       div.classList.add('log-error');
+    else if (msg.level === 'Warning') div.classList.add('log-warn');
+    else if (msg.level === 'Debug')  div.classList.add('log-debug');
+    else                             div.classList.add('log-info');
+    box.appendChild(div);
+    while (box.children.length > MAX_LOG_LINES)
+      box.removeChild(box.firstChild);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ── Full refresh ─────────────────────────────────────────────────────────
+  function refresh() {
+    api(API + '/status')
+      .then(renderStatus)
+      .catch(function () {});
+    api(API + '/profiles')
+      .then(renderProfiles)
+      .catch(function () {});
+    api(API + '/apps')
+      .then(renderApps)
+      .catch(function () {});
+  }
+
+  // ── WebSocket ───────────────────────────────────────────────────────────
+  function connectWs() {
+    var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(proto + '//' + location.host + '/ws/logs');
+    ws.onmessage = function (e) {
+      try {
+        var data = JSON.parse(e.data);
+        appendLog(data);
+      } catch (ex) {
+        appendLog({ timestamp: new Date().toISOString(), level: 'Debug', message: e.data });
+      }
+    };
+    ws.onclose = function () {
+      setTimeout(connectWs, 3000);
+    };
+  }
+
+  // ── Global action handlers ───────────────────────────────────────────────
+  window._runProfile    = function (name) { post(API + '/profiles/' + name + '/start'); };
+  window._stopProfile   = function (name) { post(API + '/profiles/' + name + '/stop'); };
+  window._downloadApp   = function (name) { post(API + '/apps/' + name + '/download'); };
+  window._runApp        = function (name) { post(API + '/apps/' + name + '/run'); };
+  window._stopApp       = function (name) { post(API + '/apps/' + name + '/stop'); };
+
+  function post(url) {
+    fetch(url, { method: 'POST' })
+      .then(function () { setTimeout(refresh, 500); })
+      .catch(function () {});
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  function esc(s) {
+    return (s || '').replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+  }
+
+  function escAttr(s) {
+    return esc(s).replace(/'/g, '&#39;');
+  }
+
+  // ── Boot ────────────────────────────────────────────────────────────────
+  refresh();
+  setInterval(refresh, 5000);
+  connectWs();
+})();
+</script>
+</body>
+</html>
