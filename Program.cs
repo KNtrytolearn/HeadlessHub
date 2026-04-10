@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.StaticFiles;
 using HeadlessHub.Core;
 using HeadlessHub.WebApi;
-using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +17,6 @@ builder.Services.AddSingleton<ProfileManager>();
 
 // LogBroadcastService: registered as BOTH singleton (so endpoints can inject it)
 // and IHostedService (so the host calls StartAsync/StopAsync).
-// Getting the same instance via two different DI tokens is the correct pattern here.
 builder.Services.AddSingleton<LogBroadcastService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<LogBroadcastService>());
 
