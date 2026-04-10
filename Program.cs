@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using HeadlessHub.Core;
 using HeadlessHub.WebApi;
@@ -23,22 +20,10 @@ builder.Services.AddSingleton<ProfileManager>();
 builder.Services.AddSingleton<LogBroadcastService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<LogBroadcastService>());
 
-// Static files (Web UI) - wwwroot/ is auto-included by Microsoft.NET.Sdk.Web
-builder.Services.AddDefaultFiles();
-builder.Services.AddStaticFiles();
+// NOTE: Microsoft.NET.Sdk.Web automatically enables static files from wwwroot/
+// No explicit AddDefaultFiles/AddStaticFiles needed.
 
 var app = builder.Build();
-
-// Serve wwwroot/ explicitly (for clarity; SDK also handles this)
-var fp = new FileExtensionContentTypeProvider();
-fp.Mappings[".ico"] = "image/x-icon";
-app.UseDefaultFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    ContentTypeProvider = fp,
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(app.Environment.ContentRootPath, "wwwroot"))
-});
 
 // Banner
 Console.WriteLine("+==========================================+");
