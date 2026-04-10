@@ -1,0 +1,16 @@
+[Unit]
+Description=HeadlessHub for autodarts.io
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/headless-hub
+ExecStart=/opt/headless-hub/headless-hub
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
