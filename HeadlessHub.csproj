@@ -17,8 +17,7 @@
     <PackageReference Include="SharpCompress" Version="0.33.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+  <!-- wwwroot/ is automatically included by Microsoft.NET.Sdk.Web -->
+  <!-- wwwroot/** is already covered by the SDK's default content items -->
 
 </Project>
