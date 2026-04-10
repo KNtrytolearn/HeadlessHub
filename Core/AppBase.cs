@@ -309,7 +309,7 @@ public abstract class AppBase
             Logger?.LogInformation("Started {App} with PID {Pid}", Name, _proc.Id);
 
             // Keep process object alive until Exited fires
-            _ = Task.Run(static? p => { try { p?.WaitForExit(); } catch { } }, _proc);
+            _ = Task.Run(static p => { try { p?.WaitForExit(); } catch { } }, _proc);
 
             return new ProcessLaunchResult(true, _proc.Id);
         }
