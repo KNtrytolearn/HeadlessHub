@@ -13,17 +13,17 @@ namespace HeadlessHub.Core;
 /// </summary>
 public class AppDownloadable : AppBase
 {
-    // ── JSON state ─────────────────────────────────────────────────────────────
+    // 閳光偓閳光偓 JSON state 閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓
 
     [JsonProperty("DownloadUrl")]
     public string DownloadUrl { get; }
 
-    // ── Paths (derived, not serialised) ───────────────────────────────────────
+    // 閳光偓閳光偓 Paths (derived, not serialised) 閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓
 
     private string AppDir => Path.Combine(Helper.GetAppBasePath(), Name);
     private string ArchivePath => Path.Combine(AppDir, Helper.GetFileNameByUrl(DownloadUrl));
 
-    // ── Constructor ───────────────────────────────────────────────────────────
+    // 閳光偓閳光偓 Constructor 閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓
 
     public AppDownloadable(
         string downloadUrl,
@@ -43,7 +43,7 @@ public class AppDownloadable : AppBase
         DownloadUrl = downloadUrl;
     }
 
-    // ── Abstract overrides ────────────────────────────────────────────────────
+    // 閳光偓閳光偓 Abstract overrides 閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓
 
     public override bool IsConfigurable() => Configuration != null;
     public override bool IsInstallable() => true;
@@ -53,16 +53,16 @@ public class AppDownloadable : AppBase
     /// <summary>Returns the absolute path to the discovered executable, or null.</summary>
     public string? GetExecutablePath() => SetRunExecutable();
 
-    // ── Install ──────────────────────────────────────────────────────────────
+    // 閳光偓閳光偓 Install 閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓
 
     /// <summary>
     /// Downloads and extracts the binary if it is missing or the remote file
-    /// has a different size. Does NOT auto-start the app — callers are
+    /// has a different size. Does NOT auto-start the app 閳?callers are
     /// responsible for that decision.
     /// </summary>
     /// <returns>
-    /// true  — a download was performed and the binary is now available<br/>
-    /// false — nothing was downloaded (already up-to-date, or my_version dir exists)
+    /// true  閳?a download was performed and the binary is now available<br/>
+    /// false 閳?nothing was downloaded (already up-to-date, or my_version dir exists)
     /// </returns>
     public override bool Install()
     {
@@ -74,7 +74,7 @@ public class AppDownloadable : AppBase
         }
 
         var localSize   = Helper.GetFileSizeByLocal(ArchivePath);
-        var remoteSize  = _FetchRemoteFileSize();
+        var remoteSize  = _FetchRemoteFileSize(DownloadUrl);
 
         if (localSize > 0 && remoteSize > 0 && localSize == remoteSize)
         {
@@ -121,9 +121,9 @@ public class AppDownloadable : AppBase
         }
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
+    // 閳光偓閳光偓 Private helpers 閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓閳光偓
 
-    private static long _FetchRemoteFileSize()
+    private long _FetchRemoteFileSize(string url)
     {
         try
         {
@@ -168,7 +168,7 @@ public class AppDownloadable : AppBase
             if (!reader.Entry.IsDirectory)
             {
                 reader.WriteEntryToDirectory(dest,
-                    new ExtractionOptions { ExtractFullPath = true, Overwrite = true });
+                    null);
             }
         }
     }
