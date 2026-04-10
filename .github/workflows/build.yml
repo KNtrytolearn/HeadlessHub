@@ -1,1 +1,104 @@
+name: Build HeadlessHub
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        include:
+          - rid: linux-arm64
+            artifact: headless-hub-linux-arm64
+          - rid: linux-x64
+            artifact: headless-hub-linux-x64
+          - rid: win-x64
+            artifact: headless-hub-win-x64
+          - rid: osx-arm64
+            artifact: headless-hub-mac-arm64
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Build
+      run: |
+        dotnet publish HeadlessHub.csproj \
+          --configuration Release \
+          --runtime ${{ matrix.rid }} \
+          --self-contained true \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:IncludeNativeLibrariesForSelfExtract=true \
+          --output ./publish/${{ matrix.artifact }}
+    
+    - name: Create Archive
+      run: |
+        cd publish
+        if [[ "${{ matrix.rid }}" == win-* ]]; then
+          7z a ../${{ matrix.artifact }}.zip ${{ matrix.artifact }}
+        else
+          tar -czvf ../${{ matrix.artifact }}.tar.gz ${{ matrix.artifact }}
+        fi
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
+        path: |
+          ${{ matrix.artifact }}.zip
+          ${{ matrix.artifact }}.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    
+    - name: Get version
+      id: version
+      run: |
+        VERSION=$(date +'%Y.%m.%d')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.version }}
+        name: HeadlessHub v${{ steps.version.outputs.version }}
+        body: |
+          ## HeadlessHub for autodarts.io
+          
+          自动编译版本，支持以下平台：
+          - Linux ARM64 (RK3528/RK3588/树莓派等)
+          - Linux x64
+          - Windows x64
+          - macOS ARM64 (Apple Silicon)
+          
+          ### 使用方法
+          1. 下载对应平台的压缩包
+          2. 解压到目标设备
+          3. 运行 `./headless-hub` (Linux/macOS) 或 `headless-hub.exe` (Windows)
+          4. 浏览器访问 http://<设备IP>:5000
+        files: |
+          artifacts/**/*.zip
+          artifacts/**/*.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
