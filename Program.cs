@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using HeadlessHub.Core;
 using HeadlessHub.WebApi;
 
@@ -25,6 +28,17 @@ builder.Services.AddDefaultFiles();
 builder.Services.AddStaticFiles();
 
 var app = builder.Build();
+
+// Serve wwwroot/ explicitly (for clarity; SDK also handles this)
+var fp = new FileExtensionContentTypeProvider();
+fp.Mappings[".ico"] = "image/x-icon";
+app.UseDefaultFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = fp,
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(app.Environment.ContentRootPath, "wwwroot"))
+});
 
 // Banner
 Console.WriteLine("+==========================================+");
