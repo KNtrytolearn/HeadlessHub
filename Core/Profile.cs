@@ -33,6 +33,7 @@ public class ProfileState
     [JsonProperty("IsRequired")]
     public bool IsRequired { get; }
 
+    [JsonIgnore]
     private bool _taggedForStart;
 
     [JsonProperty("TaggedForStart")]
@@ -56,6 +57,6 @@ public class ProfileState
         RuntimeArguments = runtimeArguments;
     }
 
-    /// <summary>Called by ProfileManager after JSON deserialization.</summary>
+    /// <summary>Called by ProfileManager after deserialisation.</summary>
     public void Bind(AppBase app) => App = app;
 }
